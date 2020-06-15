@@ -1,4 +1,5 @@
 import operator
+import treePlotter
 from math import log
 
 #计算信息熵
@@ -121,4 +122,42 @@ def createTree(dataSet, labels):
         subLabels = labels[:]
         myTree[bestFeatLabel][value] = createTree(splitDataSet(dataSet, bestFeat, value), subLabels)
     return myTree
+
+def classify(inputTree, featLabels, testVec):
+    firstStr = list(inputTree.keys())[0]
+    secondDict = inputTree[firstStr]
+    featIndex = featLabels.index(firstStr)
+    for key in secondDict.keys():
+        if testVec[featIndex] == key:
+            if type(secondDict[key]).__name__ == 'dict':
+                classLabel = classify(secondDict[key], featLabels, testVec)
+            else:
+                classLabel = secondDict[key]
+    return classLabel
+
+def storeTree(inputTree, filename):
+    import pickle
+    with open(filename, 'wb') as fw:
+        pickle.dump(inputTree, fw)
+
+def grabTree(filename):
+    import pickle
+    fr = open(filename, 'rb')
+    return pickle.load(fr)
+
+if __name__ == "__main__":
+    # test using lenses dataset.
+    with open('lenses.txt') as fr:
+        lenses = [inst.strip().split('\t') for inst in fr.readlines()]
+    lensesLabels = ['age', 'prescript', 'astigmatic', 'tearRate']
+    lensesTree = createTree(lenses, lensesLabels)
+    print(lensesTree)
+    treePlotter.createPlot(lensesTree)
+    storeTree(lensesTree, 'classifierStorage.txt')
+
+    # load tree
+    # lensesTree = grabTree('classifierStorage.txt')
+    # treePlotter.createPlot(lensesTree)
+
+
             
