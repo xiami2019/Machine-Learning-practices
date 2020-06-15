@@ -2,6 +2,8 @@ import operator
 import treePlotter
 from math import log
 
+# ID3
+
 #计算信息熵
 def calcShannonEnt(dataSet):
     '''
